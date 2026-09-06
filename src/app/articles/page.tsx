@@ -15,11 +15,11 @@ export const metadata: Metadata = {
 export const revalidate = 0;
 
 export default async function ArticlesPage() {
-  const { articles } = await getPortfolioData();
+  const { articles, settings } = await getPortfolioData();
 
   return (
     <main className="min-h-screen bg-charcoal-950 text-white flex flex-col pt-32 pb-20">
-      <Navbar />
+      <Navbar settings={settings} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1">
         <SectionHeading
@@ -28,14 +28,21 @@ export default async function ArticlesPage() {
           subtitle="Thoughts on full-stack architecture, design systems, database design, and software engineering craft."
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {articles.map((article: any, idx: number) => (
-            <ArticleCard key={article._id || article.slug || idx} article={article} />
-          ))}
-        </div>
+        {articles.length === 0 ? (
+          <div className="text-center py-16">
+            <p className="text-charcoal-400 text-sm">No published articles available at the moment.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {articles.map((article: any, idx: number) => (
+              <ArticleCard key={article._id || article.slug || idx} article={article} />
+            ))}
+          </div>
+        )}
       </div>
 
-      <Footer />
+      <Footer settings={settings} />
     </main>
   );
 }
+

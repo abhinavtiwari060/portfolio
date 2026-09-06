@@ -25,13 +25,13 @@ export async function getPortfolioData() {
   try {
     const db = await connectToDatabase();
     if (!db) {
-      console.warn("[Portfolio Data] Using fallback data because MongoDB is not connected.");
+      console.warn("[Portfolio Data] Database connection not established. Returning empty dataset.");
       return {
         profile: initialProfile,
-        skills: initialSkills,
-        projects: initialProjects,
-        articles: initialArticles,
-        testimonials: initialTestimonials,
+        skills: [],
+        projects: [],
+        articles: [],
+        testimonials: [],
         settings: defaultSettings,
       };
     }
@@ -48,64 +48,42 @@ export async function getPortfolioData() {
       profile = await Profile.create(initialProfile);
     }
 
-    // Fetch Skills
-    let skills = await Skill.find().sort({ category: 1, displayOrder: 1 }).lean();
-    if (!skills || skills.length === 0) {
-      await Skill.insertMany(initialSkills);
-      skills = await Skill.find().sort({ category: 1, displayOrder: 1 }).lean();
-    }
+    // Fetch Skills from MongoDB
+    const skills = await Skill.find().sort({ category: 1, displayOrder: 1 }).lean();
 
-    // Fetch Projects
-    let projects = await Project.find({ published: true })
+    // Fetch Published Projects from MongoDB
+    const projects = await Project.find({ published: true })
       .sort({ featured: -1, displayOrder: 1, createdAt: -1 })
       .lean();
-    if (!projects || projects.length === 0) {
-      await Project.insertMany(initialProjects);
-      projects = await Project.find({ published: true })
-        .sort({ featured: -1, displayOrder: 1, createdAt: -1 })
-        .lean();
-    }
 
-    // Fetch Articles
-    let articles = await Article.find({ published: true })
+    // Fetch Published Articles from MongoDB
+    const articles = await Article.find({ published: true })
       .sort({ publishedAt: -1 })
       .lean();
-    if (!articles || articles.length === 0) {
-      await Article.insertMany(initialArticles);
-      articles = await Article.find({ published: true })
-        .sort({ publishedAt: -1 })
-        .lean();
-    }
 
-    // Fetch Testimonials
-    let testimonials = await Testimonial.find({ published: true })
+    // Fetch Published Testimonials from MongoDB
+    const testimonials = await Testimonial.find({ published: true })
       .sort({ displayOrder: 1 })
       .lean();
-    if (!testimonials || testimonials.length === 0) {
-      await Testimonial.insertMany(initialTestimonials);
-      testimonials = await Testimonial.find({ published: true })
-        .sort({ displayOrder: 1 })
-        .lean();
-    }
 
     // Serialize MongoDB ObjectIds and Dates for Next.js Server Components
     return JSON.parse(
       JSON.stringify({
-        profile,
-        skills,
-        projects,
-        articles,
-        testimonials,
+        profile: profile || initialProfile,
+        skills: skills || [],
+        projects: projects || [],
+        articles: articles || [],
+        testimonials: testimonials || [],
         settings: {
-          showHero: settings.showHero ?? true,
-          showAbout: settings.showAbout ?? true,
-          showSkills: settings.showSkills ?? true,
-          showProjects: settings.showProjects ?? true,
-          showArticles: settings.showArticles ?? true,
-          showTestimonials: settings.showTestimonials ?? true,
-          showContact: settings.showContact ?? true,
-          siteTitle: settings.siteTitle || defaultSettings.siteTitle,
-          siteDescription: settings.siteDescription || defaultSettings.siteDescription,
+          showHero: settings?.showHero ?? true,
+          showAbout: settings?.showAbout ?? true,
+          showSkills: settings?.showSkills ?? true,
+          showProjects: settings?.showProjects ?? true,
+          showArticles: settings?.showArticles ?? true,
+          showTestimonials: settings?.showTestimonials ?? true,
+          showContact: settings?.showContact ?? true,
+          siteTitle: settings?.siteTitle || defaultSettings.siteTitle,
+          siteDescription: settings?.siteDescription || defaultSettings.siteDescription,
         },
       })
     );
@@ -113,20 +91,21 @@ export async function getPortfolioData() {
     console.error("[Portfolio Data Error]", error);
     return {
       profile: initialProfile,
-      skills: initialSkills,
-      projects: initialProjects,
-      articles: initialArticles,
-      testimonials: initialTestimonials,
+      skills: [],
+      projects: [],
+      articles: [],
+      testimonials: [],
       settings: defaultSettings,
     };
   }
 }
 
-export async function getProjectBySlug(slug: string) {
+export async function getProjectBySlug(slug: string, onlyPublished: boolean = true) {
   try {
     const db = await connectToDatabase();
     if (db) {
-      const project = await Project.findOne({ slug }).lean();
+      const query = onlyPublished ? { slug, published: true } : { slug };
+      const project = await Project.findOne(query).lean();
       if (project) {
         return JSON.parse(JSON.stringify(project));
       }
@@ -135,15 +114,15 @@ export async function getProjectBySlug(slug: string) {
     console.error("[Project By Slug Error]", err);
   }
 
-  const fallback = initialProjects.find((p) => p.slug === slug);
-  return fallback || null;
+  return null;
 }
 
-export async function getArticleBySlug(slug: string) {
+export async function getArticleBySlug(slug: string, onlyPublished: boolean = true) {
   try {
     const db = await connectToDatabase();
     if (db) {
-      const article = await Article.findOne({ slug }).lean();
+      const query = onlyPublished ? { slug, published: true } : { slug };
+      const article = await Article.findOne(query).lean();
       if (article) {
         return JSON.parse(JSON.stringify(article));
       }
@@ -152,6 +131,6 @@ export async function getArticleBySlug(slug: string) {
     console.error("[Article By Slug Error]", err);
   }
 
-  const fallback = initialArticles.find((a) => a.slug === slug);
-  return fallback || null;
+  return null;
 }
+

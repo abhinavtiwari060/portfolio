@@ -15,11 +15,11 @@ export const metadata: Metadata = {
 export const revalidate = 0;
 
 export default async function ProjectsPage() {
-  const { projects } = await getPortfolioData();
+  const { projects, settings } = await getPortfolioData();
 
   return (
     <main className="min-h-screen bg-charcoal-950 text-white flex flex-col pt-32 pb-20">
-      <Navbar />
+      <Navbar settings={settings} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1">
         <SectionHeading
@@ -28,14 +28,21 @@ export default async function ProjectsPage() {
           subtitle="A comprehensive catalogue of applications, microservices, developer tools, and client products."
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects.map((project: any, idx: number) => (
-            <ProjectCard key={project._id || project.slug || idx} project={project} />
-          ))}
-        </div>
+        {projects.length === 0 ? (
+          <div className="text-center py-16">
+            <p className="text-charcoal-400 text-sm">No published projects available at the moment.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {projects.map((project: any, idx: number) => (
+              <ProjectCard key={project._id || project.slug || idx} project={project} />
+            ))}
+          </div>
+        )}
       </div>
 
-      <Footer />
+      <Footer settings={settings} />
     </main>
   );
 }
+

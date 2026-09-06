@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 import connectToDatabase from "@/lib/mongodb";
 import { ContactMessage } from "@/models/ContactMessage";
 import { getAdminSession } from "@/lib/auth/session";
@@ -13,18 +14,35 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
   }
 
+  const { id } = params;
+  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    return NextResponse.json({ success: false, message: "Invalid message ID." }, { status: 400 });
+  }
+
   try {
     const data = await req.json();
     const db = await connectToDatabase();
-
-    if (db) {
-      const message = await ContactMessage.findByIdAndUpdate(params.id, { $set: data }, { new: true });
-      return NextResponse.json({ success: true, message });
+    if (!db) {
+      return NextResponse.json(
+        { success: false, message: "Database connection failed. Unable to update message." },
+        { status: 503 }
+      );
     }
 
-    return NextResponse.json({ success: true, message: data });
+    const message = await ContactMessage.findByIdAndUpdate(
+      id,
+      { $set: { read: !!data.read } },
+      { new: true }
+    );
+
+    if (!message) {
+      return NextResponse.json({ success: false, message: "Message not found." }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, message });
   } catch (error: any) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+    console.error("[Admin Message PUT Error]", error);
+    return NextResponse.json({ success: false, message: error.message || "Failed to update message." }, { status: 500 });
   }
 }
 
@@ -34,13 +52,29 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
   }
 
+  const { id } = params;
+  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    return NextResponse.json({ success: false, message: "Invalid message ID." }, { status: 400 });
+  }
+
   try {
     const db = await connectToDatabase();
-    if (db) {
-      await ContactMessage.findByIdAndDelete(params.id);
+    if (!db) {
+      return NextResponse.json(
+        { success: false, message: "Database connection failed. Unable to delete message." },
+        { status: 503 }
+      );
     }
-    return NextResponse.json({ success: true, message: "Message deleted successfully" });
+
+    const message = await ContactMessage.findByIdAndDelete(id);
+    if (!message) {
+      return NextResponse.json({ success: false, message: "Message not found or already deleted." }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, message: "Message deleted successfully." });
   } catch (error: any) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+    console.error("[Admin Message DELETE Error]", error);
+    return NextResponse.json({ success: false, message: error.message || "Failed to delete message." }, { status: 500 });
   }
 }
+

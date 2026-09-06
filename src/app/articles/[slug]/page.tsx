@@ -8,12 +8,14 @@ import Navbar from "@/components/portfolio/Navbar";
 import Footer from "@/components/portfolio/Footer";
 import ClayBadge from "@/components/ui/ClayBadge";
 import ClayCard from "@/components/ui/ClayCard";
-import { getArticleBySlug } from "@/lib/data/portfolio";
+import { getArticleBySlug, getPortfolioData } from "@/lib/data/portfolio";
 import { Metadata } from "next";
 
 interface Props {
   params: { slug: string };
 }
+
+export const revalidate = 0;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const article = await getArticleBySlug(params.slug);
@@ -33,7 +35,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ArticleDetailPage({ params }: Props) {
-  const article = await getArticleBySlug(params.slug);
+  const [article, { settings }] = await Promise.all([
+    getArticleBySlug(params.slug),
+    getPortfolioData(),
+  ]);
 
   if (!article) {
     notFound();
@@ -51,7 +56,8 @@ export default async function ArticleDetailPage({ params }: Props) {
 
   return (
     <main className="min-h-screen bg-charcoal-950 text-white flex flex-col pt-28 pb-20">
-      <Navbar />
+      <Navbar settings={settings} />
+
 
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1">
         {/* Back Link */}
@@ -160,7 +166,8 @@ export default async function ArticleDetailPage({ params }: Props) {
         </div>
       </article>
 
-      <Footer />
+      <Footer settings={settings} />
     </main>
   );
 }
+

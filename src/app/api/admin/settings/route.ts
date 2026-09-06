@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import connectToDatabase from "@/lib/mongodb";
 import { WebsiteSettings } from "@/models/WebsiteSettings";
 import { getAdminSession } from "@/lib/auth/session";
@@ -24,7 +25,10 @@ export async function GET() {
   try {
     const db = await connectToDatabase();
     if (!db) {
-      return NextResponse.json({ success: true, settings: DEFAULT_SETTINGS });
+      return NextResponse.json(
+        { success: false, message: "Database connection failed. Unable to fetch settings." },
+        { status: 503 }
+      );
     }
 
     let settings = await WebsiteSettings.findOne();
@@ -34,6 +38,7 @@ export async function GET() {
 
     return NextResponse.json({ success: true, settings });
   } catch (error: any) {
+    console.error("[Admin Settings GET Error]", error);
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
 }
@@ -47,18 +52,31 @@ export async function PUT(req: NextRequest) {
   try {
     const data = await req.json();
     const db = await connectToDatabase();
-
-    if (db) {
-      const updated = await WebsiteSettings.findOneAndUpdate(
-        {},
-        { $set: data },
-        { new: true, upsert: true }
+    if (!db) {
+      return NextResponse.json(
+        { success: false, message: "Database connection failed. Unable to save settings." },
+        { status: 503 }
       );
-      return NextResponse.json({ success: true, settings: updated });
     }
 
-    return NextResponse.json({ success: true, settings: data });
+    const updated = await WebsiteSettings.findOneAndUpdate(
+      {},
+      { $set: data },
+      { new: true, upsert: true }
+    );
+
+    try {
+      revalidatePath("/", "layout");
+      revalidatePath("/projects");
+      revalidatePath("/articles");
+    } catch (revalErr) {
+      console.warn("[Revalidation Warning]", revalErr);
+    }
+
+    return NextResponse.json({ success: true, settings: updated });
   } catch (error: any) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+    console.error("[Admin Settings PUT Error]", error);
+    return NextResponse.json({ success: false, message: error.message || "Failed to save settings." }, { status: 500 });
   }
 }
+

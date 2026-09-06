@@ -12,20 +12,10 @@ export async function GET() {
   try {
     const db = await connectToDatabase();
     if (!db) {
-      return NextResponse.json({
-        success: true,
-        stats: {
-          totalProjects: 4,
-          publishedProjects: 4,
-          totalArticles: 3,
-          publishedArticles: 3,
-          draftArticles: 0,
-          totalSkills: 15,
-          totalTestimonials: 2,
-          unreadMessages: 0,
-          totalMessages: 0,
-        },
-      });
+      return NextResponse.json(
+        { success: false, message: "Database connection failed. Unable to fetch stats." },
+        { status: 503 }
+      );
     }
 
     const [
@@ -55,7 +45,7 @@ export async function GET() {
         publishedProjects,
         totalArticles,
         publishedArticles,
-        draftArticles: totalArticles - publishedArticles,
+        draftArticles: Math.max(0, totalArticles - publishedArticles),
         totalSkills,
         totalTestimonials,
         unreadMessages,
@@ -67,3 +57,4 @@ export async function GET() {
     return NextResponse.json({ success: false, message: "Failed to fetch stats." }, { status: 500 });
   }
 }
+

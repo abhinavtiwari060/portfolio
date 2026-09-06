@@ -12,12 +12,17 @@ export async function GET() {
   try {
     const db = await connectToDatabase();
     if (!db) {
-      return NextResponse.json({ success: true, messages: [] });
+      return NextResponse.json(
+        { success: false, message: "Database connection failed. Unable to fetch messages." },
+        { status: 503 }
+      );
     }
 
     const messages = await ContactMessage.find().sort({ createdAt: -1 });
     return NextResponse.json({ success: true, messages });
   } catch (error: any) {
+    console.error("[Admin Messages GET Error]", error);
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
 }
+

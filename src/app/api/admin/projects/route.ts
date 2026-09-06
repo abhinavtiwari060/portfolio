@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import connectToDatabase from "@/lib/mongodb";
 import { Project } from "@/models/Project";
 import { getAdminSession } from "@/lib/auth/session";
-import { initialProjects } from "@/lib/mongodb/seedData";
 
 export async function GET() {
   const session = await getAdminSession();
@@ -13,12 +13,16 @@ export async function GET() {
   try {
     const db = await connectToDatabase();
     if (!db) {
-      return NextResponse.json({ success: true, projects: initialProjects });
+      return NextResponse.json(
+        { success: false, message: "Database connection failed. Unable to fetch projects." },
+        { status: 503 }
+      );
     }
 
     const projects = await Project.find().sort({ displayOrder: 1, createdAt: -1 });
     return NextResponse.json({ success: true, projects });
   } catch (error: any) {
+    console.error("[Admin Projects GET Error]", error);
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
 }
@@ -32,7 +36,7 @@ export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
 
-    if (!data.title || !data.shortDescription) {
+    if (!data.title?.trim() || !data.shortDescription?.trim()) {
       return NextResponse.json(
         { success: false, message: "Title and short description are required." },
         { status: 400 }
@@ -40,21 +44,64 @@ export async function POST(req: NextRequest) {
     }
 
     // Generate slug if not supplied
-    if (!data.slug) {
-      data.slug = data.title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
+    let slug = data.slug
+      ? data.slug
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, "")
+      : data.title
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, "");
+
+    if (!slug) {
+      slug = `project-${Date.now()}`;
     }
 
     const db = await connectToDatabase();
-    if (db) {
-      const project = await Project.create(data);
-      return NextResponse.json({ success: true, project });
+    if (!db) {
+      return NextResponse.json(
+        { success: false, message: "Database connection unavailable. Changes not saved." },
+        { status: 503 }
+      );
     }
 
-    return NextResponse.json({ success: true, project: { ...data, _id: "dev-temp-id" } });
+    // Check slug uniqueness
+    const existingSlug = await Project.findOne({ slug });
+    if (existingSlug) {
+      return NextResponse.json(
+        { success: false, message: `A project with the slug "${slug}" already exists. Please choose another slug.` },
+        { status: 400 }
+      );
+    }
+
+    const projectData = {
+      ...data,
+      slug,
+      features: Array.isArray(data.features) ? data.features : [],
+      technologies: Array.isArray(data.technologies) ? data.technologies : [],
+      images: Array.isArray(data.images) ? data.images : data.imageUrl ? [data.imageUrl] : [],
+      published: data.published !== false,
+      featured: !!data.featured,
+    };
+
+    const project = await Project.create(projectData);
+
+    // Trigger Next.js targeted revalidations
+    try {
+      revalidatePath("/");
+      revalidatePath("/projects");
+      revalidatePath(`/projects/${project.slug}`);
+    } catch (revalErr) {
+      console.warn("[Revalidation Warning]", revalErr);
+    }
+
+    return NextResponse.json({ success: true, project }, { status: 201 });
   } catch (error: any) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+    console.error("[Admin Projects POST Error]", error);
+    return NextResponse.json({ success: false, message: error.message || "Failed to create project." }, { status: 500 });
   }
 }
+

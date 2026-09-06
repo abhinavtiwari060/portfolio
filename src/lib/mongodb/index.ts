@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 function sanitizeMongoUri(rawUri: string): string {
   if (!rawUri) return "mongodb://127.0.0.1:27017/abhinav_portfolio";
 
-  // Check if URI is mongodb+srv or mongodb format and has credentials
   try {
     const srvPrefix = "mongodb+srv://";
     const stdPrefix = "mongodb://";
@@ -13,19 +12,19 @@ function sanitizeMongoUri(rawUri: string): string {
       const prefix = isSrv ? srvPrefix : stdPrefix;
       const rest = rawUri.slice(prefix.length);
 
-      // Find the last @ before the host domain
       const lastAtIndex = rest.lastIndexOf("@");
       if (lastAtIndex > -1) {
         const creds = rest.slice(0, lastAtIndex);
         const hostAndRest = rest.slice(lastAtIndex + 1);
 
-        // Split user and password by the first colon
         const colonIndex = creds.indexOf(":");
         if (colonIndex > -1) {
           const user = creds.slice(0, colonIndex);
           const rawPass = creds.slice(colonIndex + 1);
           // Only encode if not already encoded
-          const encodedPass = rawPass.includes("%") ? rawPass : encodeURIComponent(decodeURIComponent(rawPass));
+          const encodedPass = rawPass.includes("%")
+            ? rawPass
+            : encodeURIComponent(decodeURIComponent(rawPass));
           return `${prefix}${user}:${encodedPass}@${hostAndRest}`;
         }
       }
@@ -63,19 +62,20 @@ export async function connectToDatabase(): Promise<typeof mongoose | null> {
   }
 
   if (!cached.promise) {
-    const opts = {
+    const isAtlas = MONGODB_URI.startsWith("mongodb+srv://");
+    const opts: mongoose.ConnectOptions = {
       bufferCommands: false,
       dbName: MONGODB_DB_NAME,
       serverSelectionTimeoutMS: 8000,
       connectTimeoutMS: 10000,
-      tls: true,
       family: 4,
+      ...(isAtlas ? { tls: true } : {}),
     };
 
     cached.promise = mongoose
       .connect(MONGODB_URI, opts)
       .then((m) => {
-        console.log(`[MongoDB] Connected successfully to Atlas database: ${MONGODB_DB_NAME}`);
+        console.log(`[MongoDB] Connected successfully to database: ${MONGODB_DB_NAME}`);
         return m;
       })
       .catch((err) => {
@@ -97,3 +97,4 @@ export async function connectToDatabase(): Promise<typeof mongoose | null> {
 }
 
 export default connectToDatabase;
+
