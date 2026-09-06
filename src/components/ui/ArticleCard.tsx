@@ -35,7 +35,7 @@ export const ArticleCard: React.FC<{ article: ArticleCardData }> = ({ article })
   return (
     <ClayCard
       variant="interactive"
-      className="group relative flex flex-col h-full overflow-hidden p-0 border border-white/5 hover:border-orange-500/40"
+      className="group relative flex flex-col h-full overflow-hidden p-0 border border-white/5 dark:border-white/5 light:border-orange-500/20 hover:border-orange-500/40"
     >
       {/* Cover Image */}
       <div className="relative w-full h-48 overflow-hidden rounded-t-[26px] bg-charcoal-900">
@@ -60,26 +60,26 @@ export const ArticleCard: React.FC<{ article: ArticleCardData }> = ({ article })
       {/* Content */}
       <div className="flex flex-col flex-1 p-6">
         {/* Meta details */}
-        <div className="flex items-center gap-4 text-xs text-charcoal-400 mb-3">
+        <div className="flex items-center gap-4 text-xs text-charcoal-400 dark:text-charcoal-400 light:text-charcoal-500 mb-3">
           <span className="inline-flex items-center gap-1">
             <Calendar className="w-3.5 h-3.5 text-orange-400" />
             {formattedDate}
           </span>
           {article.readingTime && (
             <span className="inline-flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5 text-charcoal-400" />
+              <Clock className="w-3.5 h-3.5 text-charcoal-400 dark:text-charcoal-400 light:text-charcoal-500" />
               {article.readingTime}
             </span>
           )}
         </div>
 
         <Link href={`/articles/${article.slug}`} className="focus:outline-none">
-          <h3 className="text-xl font-bold text-white group-hover:text-orange-400 transition-colors line-clamp-2 mb-2.5">
+          <h3 className="text-xl font-bold text-white dark:text-white light:text-charcoal-900 group-hover:text-orange-500 transition-colors line-clamp-2 mb-2.5">
             {article.title}
           </h3>
         </Link>
 
-        <p className="text-sm text-charcoal-300 leading-relaxed line-clamp-2 mb-5">
+        <p className="text-sm text-charcoal-300 dark:text-charcoal-300 light:text-charcoal-600 leading-relaxed line-clamp-2 mb-5">
           {article.excerpt}
         </p>
 
@@ -89,7 +89,7 @@ export const ArticleCard: React.FC<{ article: ArticleCardData }> = ({ article })
             {article.tags.slice(0, 3).map((tag, idx) => (
               <span
                 key={idx}
-                className="px-2 py-0.5 text-xs rounded-md bg-charcoal-800 text-charcoal-300"
+                className="px-2 py-0.5 text-xs rounded-md bg-charcoal-800 dark:bg-charcoal-800 light:bg-orange-500/10 text-charcoal-300 dark:text-charcoal-300 light:text-charcoal-700"
               >
                 #{tag}
               </span>
@@ -97,10 +97,10 @@ export const ArticleCard: React.FC<{ article: ArticleCardData }> = ({ article })
           </div>
         )}
 
-        <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between">
+        <div className="mt-auto pt-4 border-t border-white/5 dark:border-white/5 light:border-orange-500/15 flex items-center justify-between">
           <Link
             href={`/articles/${article.slug}`}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-orange-400 hover:text-orange-300 transition-colors group/link"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-orange-400 dark:text-orange-400 light:text-orange-600 hover:text-orange-500 transition-colors group/link"
           >
             <span>Read Article</span>
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/link:translate-x-1" />

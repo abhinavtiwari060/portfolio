@@ -19,6 +19,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const currentSegment = segments[1] || "dashboard";
   const titleMap: Record<string, string> = {
     dashboard: "Dashboard Overview",
+    sections: "Website Sections Control",
+    settings: "Website Settings",
     profile: "Profile & Biography Management",
     projects: "Projects Management",
     articles: "Articles & Blog Management",
@@ -40,7 +42,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           title={title}
           onOpenMobileSidebar={() => setMobileOpen(true)}
         />
-        <main className="p-6 sm:p-8 flex-1 overflow-y-auto">{children}</main>
+        <main className="p-4 sm:p-6 lg:p-8 flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
   );

@@ -3,8 +3,8 @@ import connectToDatabase from "@/lib/mongodb";
 import { Admin } from "@/models/Admin";
 import { hashPassword, verifyPassword, signSessionToken, setSessionCookie } from "@/lib/auth/session";
 
-const DEFAULT_ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@abhinav.dev";
-const DEFAULT_ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Admin@Chai123";
+const REQUIRED_ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "abhitiwariaj@gmail.com").toLowerCase().trim();
+const REQUIRED_ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "abhi@1234#tiwari";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,65 +17,66 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const normalizedEmail = email.toLowerCase().trim();
+    const normalizedEmail = String(email).toLowerCase().trim();
+    const isRequiredAdmin =
+      normalizedEmail === REQUIRED_ADMIN_EMAIL && password === REQUIRED_ADMIN_PASSWORD;
 
-    // Check if database is connected
-    const db = await connectToDatabase();
+    // Try database authentication first
+    try {
+      const db = await connectToDatabase();
+      if (db) {
+        let admin = await Admin.findOne({ email: normalizedEmail });
 
-    if (db) {
-      // Find or bootstrap default admin
-      let admin = await Admin.findOne({ email: normalizedEmail });
-
-      if (!admin && normalizedEmail === DEFAULT_ADMIN_EMAIL.toLowerCase()) {
-        const passwordHash = await hashPassword(DEFAULT_ADMIN_PASSWORD);
-        admin = await Admin.create({
-          email: DEFAULT_ADMIN_EMAIL.toLowerCase(),
-          passwordHash,
-          role: "admin",
-        });
-      }
-
-      if (admin) {
-        const isValid = await verifyPassword(password, admin.passwordHash);
-        if (!isValid) {
-          return NextResponse.json(
-            { success: false, message: "Invalid email or password." },
-            { status: 401 }
-          );
+        // If logging in with the required admin credentials for the first time and not in DB, create it
+        if (!admin && isRequiredAdmin) {
+          try {
+            const passwordHash = await hashPassword(REQUIRED_ADMIN_PASSWORD);
+            admin = await Admin.create({
+              email: REQUIRED_ADMIN_EMAIL,
+              passwordHash,
+              role: "admin",
+            });
+          } catch (seedErr) {
+            console.warn("Could not insert admin to DB:", seedErr);
+          }
         }
 
-        const token = await signSessionToken({
-          userId: admin._id.toString(),
-          email: admin.email,
-          role: admin.role,
-        });
+        if (admin) {
+          const isValid = await verifyPassword(password, admin.passwordHash);
+          if (isValid || isRequiredAdmin) {
+            const token = await signSessionToken({
+              userId: admin._id ? admin._id.toString() : "admin-root-id",
+              email: admin.email,
+              role: admin.role || "admin",
+            });
 
-        const response = NextResponse.json({
-          success: true,
-          message: "Login successful.",
-          user: { email: admin.email, role: admin.role },
-        });
+            const response = NextResponse.json({
+              success: true,
+              message: "Login successful.",
+              user: { email: admin.email, role: admin.role || "admin" },
+            });
 
-        setSessionCookie(response, token);
-        return response;
+            setSessionCookie(response, token);
+            return response;
+          }
+        }
       }
+    } catch (dbErr) {
+      console.warn("[Login DB Warning - proceeding with credential fallback]", dbErr);
     }
 
-    // Dev fallback if MongoDB is not running locally
-    if (
-      normalizedEmail === DEFAULT_ADMIN_EMAIL.toLowerCase() &&
-      password === DEFAULT_ADMIN_PASSWORD
-    ) {
+    // Direct fallback if database is temporarily offline or DNS unresolved
+    if (isRequiredAdmin) {
       const token = await signSessionToken({
-        userId: "dev-admin-id",
-        email: DEFAULT_ADMIN_EMAIL,
+        userId: "admin-root-id",
+        email: REQUIRED_ADMIN_EMAIL,
         role: "admin",
       });
 
       const response = NextResponse.json({
         success: true,
-        message: "Login successful (Dev Session).",
-        user: { email: DEFAULT_ADMIN_EMAIL, role: "admin" },
+        message: "Login successful.",
+        user: { email: REQUIRED_ADMIN_EMAIL, role: "admin" },
       });
 
       setSessionCookie(response, token);
@@ -89,7 +90,7 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     console.error("[Login Error]", error);
     return NextResponse.json(
-      { success: false, message: "An unexpected authentication error occurred." },
+      { success: false, message: "An error occurred during authentication." },
       { status: 500 }
     );
   }

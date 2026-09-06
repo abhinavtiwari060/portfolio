@@ -61,7 +61,7 @@ const ProfileSchema = new Schema<IProfile>(
     },
     detailedBio: { type: String, default: "" },
     resumeUrl: { type: String, default: "#" },
-    email: { type: String, default: "abhinavtiwari@example.com" },
+    email: { type: String, default: "abhitiwariaj@gmail.com" },
     location: { type: String, default: "India" },
     availability: { type: String, default: "Open to opportunities" },
     education: [EducationSchema],

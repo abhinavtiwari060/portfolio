@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import confetti from "canvas-confetti";
-import { Send, CheckCircle2, Mail, Copy, Check, Sparkles } from "lucide-react";
+import { Send, Mail, Copy, Check, Sparkles } from "lucide-react";
 import SectionHeading from "../ui/SectionHeading";
 import ClayCard from "../ui/ClayCard";
 import ClayInput, { ClayTextarea } from "../ui/ClayInput";
@@ -16,7 +16,7 @@ interface ContactSectionProps {
 }
 
 export const ContactSection: React.FC<ContactSectionProps> = ({
-  email = "abhinavtiwari@example.com",
+  email = "abhitiwariaj@gmail.com",
   socialLinks = [
     { platform: "GitHub", url: "https://github.com/abhinavtiwari" },
     { platform: "LinkedIn", url: "https://linkedin.com/in/abhinavtiwari" },
@@ -38,7 +38,6 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Spam honeypot detection
     if (formData.honeypot) {
       showToast("Thank you for reaching out!", "success");
       return;
@@ -65,7 +64,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
       const data = await res.json();
 
       if (res.ok && data.success) {
-        // Trigger celebratory confetti
+        // Confetti with warm orange palette
         confetti({
           particleCount: 80,
           spread: 70,
@@ -78,7 +77,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
       } else {
         showToast(data.message || "Failed to send message.", "error");
       }
-    } catch (error) {
+    } catch {
       showToast("An unexpected network error occurred.", "error");
     } finally {
       setLoading(false);
@@ -86,9 +85,9 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   };
 
   return (
-    <section id="contact" className="py-24 relative overflow-hidden bg-grid-pattern">
-      {/* Background glow */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-orange-600/10 rounded-full blur-[140px] pointer-events-none" />
+    <section id="contact" className="py-24 relative overflow-hidden bg-grid-pattern transition-colors">
+      {/* Subtle warm orange ambient light (NO NEON) */}
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[450px] h-[450px] bg-orange-600/10 dark:bg-orange-600/10 light:bg-orange-500/5 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <SectionHeading
@@ -99,24 +98,24 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
         <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Contact Details Card */}
-          <ClayCard className="lg:col-span-5 p-8 flex flex-col justify-between h-full border border-white/5">
+          <ClayCard className="lg:col-span-5 p-8 flex flex-col justify-between h-full border border-white/5 dark:border-white/5 light:border-orange-500/20">
             <div>
               <div className="w-12 h-12 rounded-2xl bg-orange-500/15 text-orange-400 flex items-center justify-center mb-6 shadow-clay-pill border border-orange-500/30">
                 <Sparkles className="w-6 h-6" />
               </div>
 
-              <h3 className="text-xl sm:text-2xl font-bold text-white mb-3">
+              <h3 className="text-xl sm:text-2xl font-bold text-white dark:text-white light:text-charcoal-900 mb-3">
                 Let's talk code & products
               </h3>
-              <p className="text-sm text-charcoal-300 leading-relaxed mb-8">
+              <p className="text-sm text-charcoal-300 dark:text-charcoal-300 light:text-charcoal-600 leading-relaxed mb-8">
                 I'm actively seeking opportunities to build impact-driven applications with thoughtful teams. Drop me a note and I'll respond within 24 hours.
               </p>
 
               {/* Email Copy Card */}
-              <div className="p-4 rounded-2xl bg-charcoal-900/90 border border-white/5 flex items-center justify-between mb-8">
+              <div className="p-4 rounded-2xl bg-charcoal-900/90 dark:bg-charcoal-900/90 light:bg-white border border-white/5 dark:border-white/5 light:border-orange-500/15 flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3 overflow-hidden">
                   <Mail className="w-5 h-5 text-orange-400 shrink-0" />
-                  <span className="text-xs sm:text-sm font-medium text-charcoal-200 truncate">
+                  <span className="text-xs sm:text-sm font-medium text-charcoal-200 dark:text-charcoal-200 light:text-charcoal-800 truncate">
                     {email}
                   </span>
                 </div>
@@ -124,10 +123,10 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   type="button"
                   onClick={handleCopyEmail}
                   aria-label="Copy email address"
-                  className="p-2 rounded-xl bg-charcoal-800 hover:bg-charcoal-750 text-charcoal-300 hover:text-white transition-colors shrink-0"
+                  className="p-2 rounded-xl bg-charcoal-800 dark:bg-charcoal-800 light:bg-orange-500/10 text-charcoal-300 dark:text-charcoal-300 light:text-charcoal-700 hover:text-orange-400 transition-colors shrink-0"
                 >
                   {copied ? (
-                    <Check className="w-4 h-4 text-emerald-400" />
+                    <Check className="w-4 h-4 text-orange-400" />
                   ) : (
                     <Copy className="w-4 h-4" />
                   )}
@@ -137,7 +136,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
             {/* Social Channels */}
             <div>
-              <span className="block text-xs font-bold uppercase tracking-wider text-charcoal-400 mb-3">
+              <span className="block text-xs font-bold uppercase tracking-wider text-charcoal-400 dark:text-charcoal-400 light:text-charcoal-500 mb-3">
                 Connect on Socials
               </span>
               <div className="flex items-center gap-3">
@@ -149,7 +148,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
           </ClayCard>
 
           {/* Contact Form */}
-          <ClayCard className="lg:col-span-7 p-8 sm:p-10 border border-white/5">
+          <ClayCard className="lg:col-span-7 p-8 sm:p-10 border border-white/5 dark:border-white/5 light:border-orange-500/20">
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
               {/* Honeypot field (hidden from real users) */}
               <div className="hidden" aria-hidden="true">

@@ -5,3 +5,4 @@ export * from "./Article";
 export * from "./Skill";
 export * from "./Testimonial";
 export * from "./ContactMessage";
+export * from "./WebsiteSettings";

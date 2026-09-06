@@ -64,7 +64,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark scroll-smooth">
+    <html lang="en" className="dark scroll-smooth" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
@@ -73,7 +73,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="bg-charcoal-950 text-charcoal-50 font-sans selection:bg-orange-500 selection:text-white antialiased">
+      <body className="font-sans selection:bg-orange-500 selection:text-white antialiased">
         <ToastProvider>{children}</ToastProvider>
       </body>
     </html>

@@ -9,7 +9,7 @@ My development journey began with an innate curiosity about how distributed syst
 
 I strongly believe that good software is not just about writing code that worksâ€”it is about writing code that is simple to understand, straightforward to maintain, and a pleasure for end users to interact with every day.`,
   resumeUrl: "#",
-  email: "abhinavtiwari@example.com",
+  email: "abhitiwariaj@gmail.com",
   location: "India",
   availability: "Open to opportunities",
   education: [
@@ -41,7 +41,7 @@ I strongly believe that good software is not just about writing code that worksâ
     { platform: "GitHub", url: "https://github.com/abhinavtiwari", icon: "Github" },
     { platform: "LinkedIn", url: "https://linkedin.com/in/abhinavtiwari", icon: "Linkedin" },
     { platform: "Twitter/X", url: "https://twitter.com/abhinavtiwari", icon: "Twitter" },
-    { platform: "Email", url: "mailto:abhinavtiwari@example.com", icon: "Mail" },
+    { platform: "Email", url: "mailto:abhitiwariaj@gmail.com", icon: "Mail" },
   ],
 };
 

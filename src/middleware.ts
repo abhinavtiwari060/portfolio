@@ -9,7 +9,7 @@ const SESSION_COOKIE_NAME = "abhi_admin_session";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Only intercept /admin paths
+  // Only intercept /admin and subroutes
   if (!pathname.startsWith("/admin")) {
     return NextResponse.next();
   }
@@ -27,9 +27,9 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // If visiting login page while already authenticated, redirect to admin dashboard
+  // If visiting login page while already authenticated, redirect to /admin
   if (isLoginPage && isValid) {
-    return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+    return NextResponse.redirect(new URL("/admin", request.url));
   }
 
   // If accessing protected admin routes without valid session, redirect to login
@@ -43,5 +43,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin", "/admin/:path*"],
 };

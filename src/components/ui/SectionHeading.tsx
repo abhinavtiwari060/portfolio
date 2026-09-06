@@ -34,11 +34,11 @@ export const SectionHeading: React.FC<SectionHeadingProps> = ({
           {badgeText}
         </ClayBadge>
       )}
-      <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white mb-4">
+      <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white dark:text-white light:text-charcoal-900 mb-4 transition-colors">
         {title}
       </h2>
       {subtitle && (
-        <p className="text-base md:text-lg text-charcoal-300 max-w-2xl leading-relaxed">
+        <p className="text-base md:text-lg text-charcoal-300 dark:text-charcoal-300 light:text-charcoal-600 max-w-2xl leading-relaxed transition-colors">
           {subtitle}
         </p>
       )}

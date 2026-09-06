@@ -1,11 +1,49 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/abhinav_portfolio";
+function sanitizeMongoUri(rawUri: string): string {
+  if (!rawUri) return "mongodb://127.0.0.1:27017/abhinav_portfolio";
+
+  // Check if URI is mongodb+srv or mongodb format and has credentials
+  try {
+    const srvPrefix = "mongodb+srv://";
+    const stdPrefix = "mongodb://";
+
+    if (rawUri.startsWith(srvPrefix) || rawUri.startsWith(stdPrefix)) {
+      const isSrv = rawUri.startsWith(srvPrefix);
+      const prefix = isSrv ? srvPrefix : stdPrefix;
+      const rest = rawUri.slice(prefix.length);
+
+      // Find the last @ before the host domain
+      const lastAtIndex = rest.lastIndexOf("@");
+      if (lastAtIndex > -1) {
+        const creds = rest.slice(0, lastAtIndex);
+        const hostAndRest = rest.slice(lastAtIndex + 1);
+
+        // Split user and password by the first colon
+        const colonIndex = creds.indexOf(":");
+        if (colonIndex > -1) {
+          const user = creds.slice(0, colonIndex);
+          const rawPass = creds.slice(colonIndex + 1);
+          // Only encode if not already encoded
+          const encodedPass = rawPass.includes("%") ? rawPass : encodeURIComponent(decodeURIComponent(rawPass));
+          return `${prefix}${user}:${encodedPass}@${hostAndRest}`;
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("[MongoDB] URI sanitize warning:", err);
+  }
+
+  return rawUri;
+}
+
+const RAW_MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/abhinav_portfolio";
+const MONGODB_URI = sanitizeMongoUri(RAW_MONGODB_URI);
 const MONGODB_DB_NAME = process.env.MONGODB_DB_NAME || "abhinav_portfolio";
 
 interface MongooseCache {
   conn: typeof mongoose | null;
-  promise: Promise<typeof mongoose> | null;
+  promise: Promise<typeof mongoose | null> | null;
 }
 
 declare global {
@@ -28,18 +66,20 @@ export async function connectToDatabase(): Promise<typeof mongoose | null> {
     const opts = {
       bufferCommands: false,
       dbName: MONGODB_DB_NAME,
-      serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 8000,
+      serverSelectionTimeoutMS: 8000,
+      connectTimeoutMS: 10000,
+      tls: true,
+      family: 4,
     };
 
     cached.promise = mongoose
       .connect(MONGODB_URI, opts)
       .then((m) => {
-        console.log(`[MongoDB] Connected successfully to ${MONGODB_DB_NAME}`);
+        console.log(`[MongoDB] Connected successfully to Atlas database: ${MONGODB_DB_NAME}`);
         return m;
       })
       .catch((err) => {
-        console.warn(`[MongoDB Warning] Could not connect to MongoDB at ${MONGODB_URI}:`, err.message);
+        console.error(`[MongoDB Error] Connection failed:`, err.message);
         cached.promise = null;
         return null;
       });
@@ -49,7 +89,7 @@ export async function connectToDatabase(): Promise<typeof mongoose | null> {
     cached.conn = await cached.promise;
   } catch (e) {
     cached.promise = null;
-    console.error("[MongoDB Error] Failed to resolve connection:", e);
+    console.error("[MongoDB Error] Failed to resolve connection promise:", e);
     return null;
   }
 

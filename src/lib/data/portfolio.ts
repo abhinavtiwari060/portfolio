@@ -1,5 +1,5 @@
 import connectToDatabase from "../mongodb";
-import { Profile, Skill, Project, Article, Testimonial } from "@/models";
+import { Profile, Skill, Project, Article, Testimonial, WebsiteSettings } from "@/models";
 import {
   initialProfile,
   initialSkills,
@@ -8,25 +8,44 @@ import {
   initialTestimonials,
 } from "../mongodb/seedData";
 
+export const defaultSettings = {
+  showHero: true,
+  showAbout: true,
+  showSkills: true,
+  showProjects: true,
+  showArticles: true,
+  showTestimonials: true,
+  showContact: true,
+  siteTitle: "Abhinav Kumar Tiwari (Abhi) • Full Stack Developer & Builder",
+  siteDescription:
+    "Developer • Builder • Problem Solver. Building practical, high-performance web experiences with modern architecture.",
+};
+
 export async function getPortfolioData() {
   try {
     const db = await connectToDatabase();
     if (!db) {
-      console.warn("[Portfolio Data] Using seed data fallback because MongoDB is not connected.");
+      console.warn("[Portfolio Data] Using fallback data because MongoDB is not connected.");
       return {
         profile: initialProfile,
         skills: initialSkills,
         projects: initialProjects,
         articles: initialArticles,
         testimonials: initialTestimonials,
+        settings: defaultSettings,
       };
     }
 
+    // Fetch WebsiteSettings
+    let settings: any = await WebsiteSettings.findOne().lean();
+    if (!settings) {
+      settings = await WebsiteSettings.create(defaultSettings);
+    }
+
     // Fetch Profile
-    let profile = await Profile.findOne().lean();
+    let profile: any = await Profile.findOne().lean();
     if (!profile) {
-      // Auto seed initial profile
-      profile = (await Profile.create(initialProfile)).toObject();
+      profile = await Profile.create(initialProfile);
     }
 
     // Fetch Skills
@@ -77,6 +96,17 @@ export async function getPortfolioData() {
         projects,
         articles,
         testimonials,
+        settings: {
+          showHero: settings.showHero ?? true,
+          showAbout: settings.showAbout ?? true,
+          showSkills: settings.showSkills ?? true,
+          showProjects: settings.showProjects ?? true,
+          showArticles: settings.showArticles ?? true,
+          showTestimonials: settings.showTestimonials ?? true,
+          showContact: settings.showContact ?? true,
+          siteTitle: settings.siteTitle || defaultSettings.siteTitle,
+          siteDescription: settings.siteDescription || defaultSettings.siteDescription,
+        },
       })
     );
   } catch (error) {
@@ -87,6 +117,7 @@ export async function getPortfolioData() {
       projects: initialProjects,
       articles: initialArticles,
       testimonials: initialTestimonials,
+      settings: defaultSettings,
     };
   }
 }
@@ -104,7 +135,6 @@ export async function getProjectBySlug(slug: string) {
     console.error("[Project By Slug Error]", err);
   }
 
-  // Fallback to initialProjects
   const fallback = initialProjects.find((p) => p.slug === slug);
   return fallback || null;
 }
@@ -122,7 +152,6 @@ export async function getArticleBySlug(slug: string) {
     console.error("[Article By Slug Error]", err);
   }
 
-  // Fallback to initialArticles
   const fallback = initialArticles.find((a) => a.slug === slug);
   return fallback || null;
 }

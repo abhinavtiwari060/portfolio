@@ -3,12 +3,19 @@
 @tailwind utilities;
 
 :root {
-  --background: #080a0d;
-  --foreground: #f8fafc;
-  --primary-orange: #f97316;
-  --primary-orange-hover: #ea580c;
-  --charcoal-card: #12151c;
-  --charcoal-elevated: #181d26;
+  --bg-canvas: #080a0d;
+  --bg-surface: #0d0f14;
+  --bg-card: #12151c;
+  --bg-elevated: #181d26;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --orange-core: #f97316;
+  --orange-hover: #ea580c;
+  --orange-light: #fb923c;
+  --orange-dark: #c2410c;
+  color-scheme: dark;
 }
 
 html {
@@ -17,8 +24,8 @@ html {
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   overflow-x: hidden;
   min-height: 100vh;
@@ -31,20 +38,20 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #080a0d;
+  background: var(--bg-canvas);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2a3243;
+  background: #261f1a;
   border-radius: 9999px;
-  border: 2px solid #080a0d;
+  border: 2px solid var(--bg-canvas);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #ea580c;
+  background: var(--orange-core);
 }
 
-/* Claymorphic Utility Classes */
+/* Claymorphic Utility Classes (Dark Clay with Orange Highlights) */
 @layer components {
   .clay-card {
     background: linear-gradient(145deg, #161b24, #0f1218);
@@ -58,31 +65,17 @@ body {
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .clay-card-hover {
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
   .clay-card-hover:hover {
     transform: translateY(-4px) scale(1.005);
-    border-color: rgba(249, 115, 22, 0.3);
+    border-color: rgba(249, 115, 22, 0.35);
     box-shadow: 
       0 20px 40px -6px rgba(0, 0, 0, 0.8),
-      0 8px 16px -4px rgba(249, 115, 22, 0.2),
+      0 8px 16px -4px rgba(249, 115, 22, 0.15),
       inset 1px 1px 3px rgba(255, 255, 255, 0.15),
       inset -2px -2px 5px rgba(0, 0, 0, 0.7);
   }
 
-  .clay-card-orange {
-    background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
-    border-radius: 28px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    box-shadow: 
-      0 12px 30px -4px rgba(234, 88, 12, 0.4),
-      0 4px 12px -2px rgba(154, 52, 18, 0.4),
-      inset 1px 1px 3px rgba(255, 255, 255, 0.45),
-      inset -2px -2px 4px rgba(67, 20, 7, 0.6);
-  }
-
+  /* Primary Button (Warm Orange) */
   .clay-button-primary {
     background: linear-gradient(135deg, #fb923c 0%, #ea580c 60%, #c2410c 100%);
     color: #ffffff;
@@ -114,6 +107,7 @@ body {
       inset -1px -1px 2px rgba(255, 255, 255, 0.2);
   }
 
+  /* Secondary Button */
   .clay-button-secondary {
     background: linear-gradient(145deg, #1b212c, #131720);
     color: #f1f5f9;
@@ -131,20 +125,9 @@ body {
     transform: translateY(-2px);
     color: #fb923c;
     border-color: rgba(249, 115, 22, 0.35);
-    box-shadow: 
-      0 10px 22px -3px rgba(0, 0, 0, 0.6),
-      0 2px 8px -1px rgba(249, 115, 22, 0.15),
-      inset 1px 1px 2px rgba(255, 255, 255, 0.18),
-      inset -2px -2px 4px rgba(0, 0, 0, 0.6);
   }
 
-  .clay-button-secondary:active {
-    transform: translateY(1px);
-    box-shadow: 
-      0 2px 4px 0 rgba(0, 0, 0, 0.5),
-      inset 2px 2px 4px rgba(0, 0, 0, 0.7);
-  }
-
+  /* Badges */
   .clay-badge {
     background: linear-gradient(145deg, #1a202a, #11151d);
     border: 1px solid rgba(255, 255, 255, 0.07);
@@ -166,6 +149,7 @@ body {
       inset -1px -1px 2px rgba(67, 20, 7, 0.4);
   }
 
+  /* Form Inputs */
   .clay-input {
     background: #0d1016;
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -186,7 +170,7 @@ body {
   }
 }
 
-/* Subtle background noise texture */
+/* Background Grid Pattern */
 .bg-grid-pattern {
   background-size: 40px 40px;
   background-image: 

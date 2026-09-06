@@ -24,8 +24,8 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ title, onOpenMobileSid
 
       <div className="flex items-center gap-3">
         <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-charcoal-900 border border-white/5 text-xs text-charcoal-300">
-          <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          <span>Authenticated Admin</span>
+          <ShieldCheck className="w-4 h-4 text-orange-400" />
+          <span className="font-medium">Authenticated Admin</span>
         </div>
       </div>
     </header>

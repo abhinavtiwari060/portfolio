@@ -33,7 +33,6 @@ const ArticleSchema = new Schema<IArticle>(
   { timestamps: true }
 );
 
-ArticleSchema.index({ slug: 1 });
 ArticleSchema.index({ published: 1, publishedAt: -1 });
 
 export const Article: Model<IArticle> =

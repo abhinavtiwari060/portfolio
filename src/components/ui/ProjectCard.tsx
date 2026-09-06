@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ExternalLink, Github, ArrowRight, Layers } from "lucide-react";
+import { ExternalLink, Github, ArrowRight } from "lucide-react";
 import { ClayCard } from "./ClayCard";
 import { ClayBadge } from "./ClayBadge";
 
@@ -31,7 +31,7 @@ export const ProjectCard: React.FC<{ project: ProjectCardData; priority?: boolea
   return (
     <ClayCard
       variant="interactive"
-      className="group relative flex flex-col h-full overflow-hidden p-0 border border-white/5 hover:border-orange-500/40"
+      className="group relative flex flex-col h-full overflow-hidden p-0 border border-white/5 dark:border-white/5 light:border-orange-500/20 hover:border-orange-500/40"
     >
       {/* Image Container with zoom */}
       <div className="relative w-full h-56 sm:h-64 overflow-hidden rounded-t-[26px] bg-charcoal-900">
@@ -53,10 +53,10 @@ export const ProjectCard: React.FC<{ project: ProjectCardData; priority?: boolea
           </div>
         )}
 
-        {/* Featured Star Pill */}
+        {/* Featured Pill (Warm Orange - NO NEON) */}
         {project.featured && (
           <div className="absolute top-4 right-4 z-10">
-            <span className="px-2.5 py-1 text-[11px] font-bold tracking-wide uppercase rounded-full bg-orange-500/90 text-white shadow-lg backdrop-blur-md">
+            <span className="px-2.5 py-1 text-[11px] font-bold tracking-wide uppercase rounded-full bg-orange-600 text-white shadow-md">
               Featured
             </span>
           </div>
@@ -66,12 +66,12 @@ export const ProjectCard: React.FC<{ project: ProjectCardData; priority?: boolea
       {/* Card Body */}
       <div className="flex flex-col flex-1 p-6 sm:p-7">
         <Link href={`/projects/${project.slug}`} className="focus:outline-none">
-          <h3 className="text-xl sm:text-2xl font-bold text-white group-hover:text-orange-400 transition-colors line-clamp-1 mb-2.5">
+          <h3 className="text-xl sm:text-2xl font-bold text-white dark:text-white light:text-charcoal-900 group-hover:text-orange-500 transition-colors line-clamp-1 mb-2.5">
             {project.title}
           </h3>
         </Link>
 
-        <p className="text-sm text-charcoal-300 leading-relaxed line-clamp-2 mb-5">
+        <p className="text-sm text-charcoal-300 dark:text-charcoal-300 light:text-charcoal-600 leading-relaxed line-clamp-2 mb-5">
           {project.shortDescription}
         </p>
 
@@ -81,13 +81,13 @@ export const ProjectCard: React.FC<{ project: ProjectCardData; priority?: boolea
             {project.technologies.slice(0, 4).map((tech, idx) => (
               <span
                 key={idx}
-                className="px-2.5 py-1 text-xs rounded-lg bg-charcoal-800 text-charcoal-300 border border-charcoal-700/50"
+                className="px-2.5 py-1 text-xs rounded-lg bg-charcoal-800 dark:bg-charcoal-800 light:bg-orange-500/10 text-charcoal-300 dark:text-charcoal-300 light:text-charcoal-700 border border-charcoal-700/50 dark:border-charcoal-700/50 light:border-orange-500/15"
               >
                 {tech}
               </span>
             ))}
             {project.technologies.length > 4 && (
-              <span className="px-2 py-1 text-xs rounded-lg bg-charcoal-800/60 text-charcoal-400 border border-charcoal-700/40">
+              <span className="px-2 py-1 text-xs rounded-lg bg-charcoal-800/60 dark:bg-charcoal-800/60 light:bg-orange-500/5 text-charcoal-400 dark:text-charcoal-400 light:text-charcoal-600 border border-charcoal-700/40 dark:border-charcoal-700/40 light:border-orange-500/10">
                 +{project.technologies.length - 4}
               </span>
             )}
@@ -95,10 +95,10 @@ export const ProjectCard: React.FC<{ project: ProjectCardData; priority?: boolea
         )}
 
         {/* Action Controls */}
-        <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between gap-3">
+        <div className="mt-auto pt-4 border-t border-white/5 dark:border-white/5 light:border-orange-500/15 flex items-center justify-between gap-3">
           <Link
             href={`/projects/${project.slug}`}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-orange-400 hover:text-orange-300 transition-colors group/link"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-orange-400 dark:text-orange-400 light:text-orange-600 hover:text-orange-500 transition-colors group/link"
           >
             <span>Case Study</span>
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/link:translate-x-1" />
@@ -111,7 +111,7 @@ export const ProjectCard: React.FC<{ project: ProjectCardData; priority?: boolea
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="View Source on GitHub"
-                className="p-2 rounded-full bg-charcoal-800 hover:bg-charcoal-750 text-charcoal-300 hover:text-white transition-all hover:scale-105"
+                className="p-2 rounded-full bg-charcoal-800 dark:bg-charcoal-800 light:bg-white text-charcoal-300 dark:text-charcoal-300 light:text-charcoal-700 hover:text-orange-400 border border-white/5 dark:border-white/5 light:border-orange-500/20 transition-all hover:scale-105"
               >
                 <Github className="w-4 h-4" />
               </a>
