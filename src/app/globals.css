@@ -1,0 +1,195 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #080a0d;
+  --foreground: #f8fafc;
+  --primary-orange: #f97316;
+  --primary-orange-hover: #ea580c;
+  --charcoal-card: #12151c;
+  --charcoal-elevated: #181d26;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080a0d;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a3243;
+  border-radius: 9999px;
+  border: 2px solid #080a0d;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ea580c;
+}
+
+/* Claymorphic Utility Classes */
+@layer components {
+  .clay-card {
+    background: linear-gradient(145deg, #161b24, #0f1218);
+    border-radius: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 
+      0 12px 30px -4px rgba(0, 0, 0, 0.7),
+      0 4px 10px -2px rgba(0, 0, 0, 0.5),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.1),
+      inset -2px -2px 4px rgba(0, 0, 0, 0.6);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .clay-card-hover {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .clay-card-hover:hover {
+    transform: translateY(-4px) scale(1.005);
+    border-color: rgba(249, 115, 22, 0.3);
+    box-shadow: 
+      0 20px 40px -6px rgba(0, 0, 0, 0.8),
+      0 8px 16px -4px rgba(249, 115, 22, 0.2),
+      inset 1px 1px 3px rgba(255, 255, 255, 0.15),
+      inset -2px -2px 5px rgba(0, 0, 0, 0.7);
+  }
+
+  .clay-card-orange {
+    background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+    border-radius: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 
+      0 12px 30px -4px rgba(234, 88, 12, 0.4),
+      0 4px 12px -2px rgba(154, 52, 18, 0.4),
+      inset 1px 1px 3px rgba(255, 255, 255, 0.45),
+      inset -2px -2px 4px rgba(67, 20, 7, 0.6);
+  }
+
+  .clay-button-primary {
+    background: linear-gradient(135deg, #fb923c 0%, #ea580c 60%, #c2410c 100%);
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 
+      0 8px 20px -2px rgba(249, 115, 22, 0.5),
+      0 3px 6px -1px rgba(234, 88, 12, 0.3),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.4),
+      inset -2px -2px 4px rgba(124, 45, 18, 0.6);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .clay-button-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      0 12px 26px -2px rgba(249, 115, 22, 0.65),
+      0 4px 8px -1px rgba(234, 88, 12, 0.4),
+      inset 1px 1px 3px rgba(255, 255, 255, 0.5),
+      inset -2px -2px 5px rgba(124, 45, 18, 0.7);
+  }
+
+  .clay-button-primary:active {
+    transform: translateY(1px);
+    box-shadow: 
+      0 2px 6px 0 rgba(249, 115, 22, 0.4),
+      inset 2px 2px 4px rgba(124, 45, 18, 0.7),
+      inset -1px -1px 2px rgba(255, 255, 255, 0.2);
+  }
+
+  .clay-button-secondary {
+    background: linear-gradient(145deg, #1b212c, #131720);
+    color: #f1f5f9;
+    font-weight: 500;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+      0 6px 16px -2px rgba(0, 0, 0, 0.5),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.12),
+      inset -2px -2px 3px rgba(0, 0, 0, 0.5);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .clay-button-secondary:hover {
+    transform: translateY(-2px);
+    color: #fb923c;
+    border-color: rgba(249, 115, 22, 0.35);
+    box-shadow: 
+      0 10px 22px -3px rgba(0, 0, 0, 0.6),
+      0 2px 8px -1px rgba(249, 115, 22, 0.15),
+      inset 1px 1px 2px rgba(255, 255, 255, 0.18),
+      inset -2px -2px 4px rgba(0, 0, 0, 0.6);
+  }
+
+  .clay-button-secondary:active {
+    transform: translateY(1px);
+    box-shadow: 
+      0 2px 4px 0 rgba(0, 0, 0, 0.5),
+      inset 2px 2px 4px rgba(0, 0, 0, 0.7);
+  }
+
+  .clay-badge {
+    background: linear-gradient(145deg, #1a202a, #11151d);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 9999px;
+    box-shadow: 
+      0 4px 10px rgba(0, 0, 0, 0.35),
+      inset 1px 1px 1px rgba(255, 255, 255, 0.12),
+      inset -1px -1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .clay-badge-orange {
+    background: linear-gradient(145deg, rgba(249, 115, 22, 0.2), rgba(194, 65, 12, 0.15));
+    border: 1px solid rgba(249, 115, 22, 0.35);
+    color: #fb923c;
+    border-radius: 9999px;
+    box-shadow: 
+      0 4px 10px rgba(249, 115, 22, 0.12),
+      inset 1px 1px 1px rgba(255, 255, 255, 0.15),
+      inset -1px -1px 2px rgba(67, 20, 7, 0.4);
+  }
+
+  .clay-input {
+    background: #0d1016;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    box-shadow: 
+      inset 2px 2px 5px rgba(0, 0, 0, 0.75),
+      inset -1px -1px 2px rgba(255, 255, 255, 0.05);
+    color: #f8fafc;
+    transition: all 0.2s ease;
+  }
+
+  .clay-input:focus {
+    outline: none;
+    border-color: #f97316;
+    box-shadow: 
+      inset 2px 2px 5px rgba(0, 0, 0, 0.75),
+      0 0 0 3px rgba(249, 115, 22, 0.2);
+  }
+}
+
+/* Subtle background noise texture */
+.bg-grid-pattern {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+}
